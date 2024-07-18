@@ -4,8 +4,8 @@
     "fileLoggingMode": "debugOnly",
     "logLevel": {
       "default": "Information",
-      "Host": "Error",
-      "Function": "Error",
+      "Host": "Information",
+      "Function": "Information",
       "Host.Aggregator": "Information"
     }
   }
