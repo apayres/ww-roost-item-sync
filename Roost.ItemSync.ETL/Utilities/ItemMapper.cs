@@ -16,8 +16,10 @@ namespace Roost.ItemSync.ETL.Utilities
                 CategoryDescription = source.Category.CategoryDescription,
                 ParentCategory = source.Category.ParentCategory?.CategoryName,
                 ParentCategoryDescription = source.Category.ParentCategory?.CategoryDescription,
-                Attributes = new List<ItemAttribute>(),
-                Images = new List<ItemImage>(),
+                ItemAttributes = new ItemAttributes()
+                {
+                    Price = source.RetailPrice
+                },
                 UnitOfMeasure = new UnitOfMeasure()
                 {
                     Description = source.UnitOfMeasure?.UnitOfMeasureDescription,
@@ -27,22 +29,31 @@ namespace Roost.ItemSync.ETL.Utilities
 
             if (source.Attributes != null && source.Attributes.Any())
             {
-                item.Attributes = source.Attributes.Select(x => new ItemAttribute()
+                foreach (var attribute in source.Attributes)
                 {
-                    Description = x.AttributeDescription,
-                    Name = x.AttributeName,
-                    Value = x.AttributeValue?.AttributeValue,
-                    DisplayOrder = x.AttributeValue?.DisplayOrder ?? 0
-                }).ToList();
+                    if (attribute.AttributeName == AttributeKeys.Calories && int.TryParse(attribute.AttributeValue.AttributeValue.ToString(), out int calories))
+                    {
+                        item.ItemAttributes.Calories = calories;
+                        continue;
+                    }
+
+                    if (attribute.AttributeName == AttributeKeys.Price && decimal.TryParse(attribute.AttributeValue.AttributeValue.ToString(), out decimal price))
+                    {
+                        item.ItemAttributes.Price = price;
+                        continue;
+                    }
+
+                    if (attribute.AttributeName == AttributeKeys.CupSize)
+                    {
+                        item.ItemAttributes.CupSize = attribute.AttributeValue?.AttributeValue?.ToString().Trim() ?? string.Empty;
+                        continue;
+                    }
+                }
             }
 
             if (source.Images != null && source.Images.Any())
             {
-                item.Images = source.Images.Select(x => new ItemImage()
-                {
-                    DisplayOrder = x.DisplayOrder,
-                    AbsoluteUri = x.AbsoluteUri
-                }).ToList();
+                item.ImageUrl = source.Images[0].AbsoluteUri;
             }
 
             return item;

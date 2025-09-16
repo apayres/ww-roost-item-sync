@@ -12,7 +12,7 @@ namespace Roost.ItemSync.ETL.WebServices
 
         public async Task<List<Item>> GetItems()
         {
-            var uri = "item";
+            var uri = "companycatalog/catalog/RST5464654";
             var response = await GetAsync(uri);
 
             response.EnsureSuccessStatusCode();

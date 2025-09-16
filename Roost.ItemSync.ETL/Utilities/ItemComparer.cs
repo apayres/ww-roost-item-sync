@@ -1,4 +1,6 @@
-﻿namespace Roost.ItemSync.ETL.Utilities
+﻿using Roost.ItemSync.ETL.Models.Target;
+
+namespace Roost.ItemSync.ETL.Utilities
 {
     public static class ItemComparer
     {
@@ -34,6 +36,11 @@
                 return false;
             }
 
+            if (source.RetailPrice != target.ItemAttributes?.Price)
+            {
+                return false;
+            }
+
             if (!DoAttributesMatch(source, target))
             {
                 return false;
@@ -56,35 +63,52 @@
         {
             if (source.Attributes != null && source.Attributes.Any())
             {
-                if (target.Attributes == null || !target.Attributes.Any())
+                if (target.ItemAttributes == null || target.ItemAttributes.Price == null || target.ItemAttributes.Calories == null || string.IsNullOrEmpty(target.ItemAttributes.CupSize))
                 {
                     return false;
                 }
 
                 foreach (var attribute in source.Attributes)
                 {
-                    var matchingAttribute = target.Attributes.FirstOrDefault(x => x.Name == attribute.AttributeName);
-                    if (matchingAttribute == null)
+                    if (attribute.AttributeName == AttributeKeys.Calories)
                     {
-                        return false;
+                        if (int.TryParse(attribute.AttributeValue.ToString(), out int calories))
+                        {
+                            if (calories != target.ItemAttributes.Calories)
+                            {
+                                return false;
+                            }
+                        }
+
+                        continue;
                     }
 
-                    if (matchingAttribute.Name != attribute.AttributeName
-                        || matchingAttribute.Description != attribute.AttributeDescription
-                        || matchingAttribute.Value?.ToString() != attribute.AttributeValue?.AttributeValue
-                        || matchingAttribute.DisplayOrder != attribute.AttributeValue?.DisplayOrder)
+                    if (attribute.AttributeName == AttributeKeys.CupSize)
                     {
-                        return false;
+                        if (!string.IsNullOrWhiteSpace(attribute.AttributeValue?.ToString()))
+                        {
+                            var cupSize = attribute.AttributeValue.ToString().Trim();
+                            if (cupSize != target.ItemAttributes.CupSize)
+                            {
+                                return false;
+                            }
+                        }
+
+                        continue;
                     }
                 }
 
-                var deletedAttributes = target.Attributes.Where(x => source.Attributes.Any(y => y.AttributeName == x.Name));
-                if (deletedAttributes.Any())
+                if (!source.Attributes.Any(x => x.AttributeName == AttributeKeys.Calories))
+                {
+                    return false;
+                }
+
+                if (!source.Attributes.Any(x => x.AttributeName == AttributeKeys.CupSize))
                 {
                     return false;
                 }
             }
-            else if (target.Attributes != null && target.Attributes.Any())
+            else if (target.ItemAttributes != null && target.ItemAttributes.Calories != null && !string.IsNullOrEmpty(target.ItemAttributes.CupSize))
             {
                 return false;
             }
@@ -96,34 +120,22 @@
         {
             if (source.Images != null && source.Images.Any())
             {
-                if (target.Images == null || !target.Images.Any())
+                if (string.IsNullOrEmpty(target.ImageUrl))
                 {
                     return false;
                 }
 
-                foreach (var img in source.Images)
-                {
-                    var matchingImage = target.Images.FirstOrDefault(x => x.AbsoluteUri == img.AbsoluteUri);
-                    if (matchingImage == null)
-                    {
-                        return false;
-                    }
-
-                    if (matchingImage.DisplayOrder != img.DisplayOrder)
-                    {
-                        return false;
-                    }
-                }
-
-                var deletedImages = target.Images.Where(x => source.Images.Any(y => y.AbsoluteUri == x.AbsoluteUri));
-                if (deletedImages.Any())
+                if (source.Images[0].AbsoluteUri != target.ImageUrl)
                 {
                     return false;
                 }
             }
-            else if (target.Images != null && target.Images.Any())
+            else
             {
-                return false;
+                if (!string.IsNullOrEmpty(target.ImageUrl))
+                {
+                    return false;
+                }
             }
 
             return true;

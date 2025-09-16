@@ -12,6 +12,8 @@
 
         public double UnitQuantity { set; get; }
 
+        public decimal? RetailPrice { set; get; }
+
         public List<ItemAttribute> Attributes { get; set; }
 
         public Category Category { get; set; }

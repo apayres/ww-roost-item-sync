@@ -43,8 +43,10 @@ namespace Roost.ItemSync.ETL.UnitTests.Utilities
             Assert.AreEqual(source.Category.ParentCategory.CategoryDescription, target.ParentCategoryDescription);
             Assert.AreEqual(source.UnitOfMeasure.UnitOfMeasureName, target.UnitOfMeasure.Name);
             Assert.AreEqual(source.UnitOfMeasure.UnitOfMeasureDescription, target.UnitOfMeasure.Description);
-            Assert.IsFalse(target.Attributes.Any());
-            Assert.IsFalse(target.Images.Any());
+            Assert.IsNull(target.ItemAttributes.Price);
+            Assert.IsNull(target.ItemAttributes.Calories);
+            Assert.IsNull(target.ItemAttributes.CupSize);
+            Assert.IsNull(target.ImageUrl);
         }
 
         [TestMethod]
@@ -75,12 +77,26 @@ namespace Roost.ItemSync.ETL.UnitTests.Utilities
                 {
                     new ItemAttribute()
                     {
-                        AttributeDescription = "UT Attribute Desc",
-                        AttributeName = "UT ATTR",
+                        AttributeName = "Calories",
                         AttributeValue = new ItemAttributeValue()
                         {
-                            AttributeValue = "FourtyTwo",
-                            DisplayOrder = 9
+                            AttributeValue = "42"
+                        }
+                    },
+                    new ItemAttribute()
+                    {
+                        AttributeName = "Price",
+                        AttributeValue = new ItemAttributeValue()
+                        {
+                            AttributeValue = "3.99"
+                        }
+                    },
+                    new ItemAttribute()
+                    {
+                        AttributeName = "Cup Size",
+                        AttributeValue = new ItemAttributeValue()
+                        {
+                            AttributeValue = "Regular"
                         }
                     }
                 },
@@ -95,14 +111,11 @@ namespace Roost.ItemSync.ETL.UnitTests.Utilities
             };
 
             var target = ItemMapper.MapToTarget(source);
-            Assert.AreEqual(1, target.Attributes.Count);
-            Assert.AreEqual(source.Attributes[0].AttributeName, target.Attributes[0].Name);
-            Assert.AreEqual(source.Attributes[0].AttributeDescription, target.Attributes[0].Description);
-            Assert.AreEqual(source.Attributes[0].AttributeValue.AttributeValue, target.Attributes[0].Value);
-            Assert.AreEqual(source.Attributes[0].AttributeValue.DisplayOrder, target.Attributes[0].DisplayOrder);
-            Assert.AreEqual(1, target.Images.Count);
-            Assert.AreEqual(source.Images[0].AbsoluteUri, target.Images[0].AbsoluteUri);
-            Assert.AreEqual(source.Images[0].DisplayOrder, target.Images[0].DisplayOrder);
+            Assert.AreEqual(3.99m, target.ItemAttributes.Price);
+            Assert.AreEqual(42, target.ItemAttributes.Calories);
+            Assert.AreEqual("Regular", target.ItemAttributes.CupSize);
+            Assert.AreEqual("some-web-address", target.ImageUrl);
+
         }
     }
 }

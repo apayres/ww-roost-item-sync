@@ -1,4 +1,5 @@
-﻿using Roost.ItemSync.ETL.Utilities;
+﻿using Roost.ItemSync.ETL.Models.Target;
+using Roost.ItemSync.ETL.Utilities;
 
 namespace Roost.ItemSync.ETL.UnitTests.Utilities
 {
@@ -185,12 +186,10 @@ namespace Roost.ItemSync.ETL.UnitTests.Utilities
                 {
                     new Models.Source.ItemAttribute()
                     {
-                        AttributeDescription = "UT Attr DESC",
-                        AttributeName = "UT Attr",
+                        AttributeName = AttributeKeys.Calories,
                         AttributeValue = new Models.Source.ItemAttributeValue()
                         {
-                            AttributeValue = "45",
-                            DisplayOrder = 1
+                            AttributeValue = "45"
                         }
                     }
                 }
@@ -212,15 +211,9 @@ namespace Roost.ItemSync.ETL.UnitTests.Utilities
                 },
                 UnitQuantity = 1,
                 Upc = "6345789",
-                Attributes = new List<Models.Target.ItemAttribute>
+                ItemAttributes = new ItemAttributes
                 {
-                    new Models.Target.ItemAttribute()
-                    {
-                        DisplayOrder = source.Attributes[0].AttributeValue.DisplayOrder,
-                        Description = source.Attributes[0].AttributeDescription,
-                        Name = source.Attributes[0].AttributeName,
-                        Value = "VALUE CHANGED"
-                    }
+                    Calories = 40
                 }
             };
 
@@ -255,12 +248,10 @@ namespace Roost.ItemSync.ETL.UnitTests.Utilities
                 {
                     new Models.Source.ItemAttribute()
                     {
-                        AttributeDescription = "UT Attr DESC",
-                        AttributeName = "UT Attr",
+                        AttributeName = AttributeKeys.Price,
                         AttributeValue = new Models.Source.ItemAttributeValue()
                         {
-                            AttributeValue = "45",
-                            DisplayOrder = 1
+                            AttributeValue = "3.99"
                         }
                     }
                 }
@@ -282,15 +273,9 @@ namespace Roost.ItemSync.ETL.UnitTests.Utilities
                 },
                 UnitQuantity = 1,
                 Upc = "6345789",
-                Attributes = new List<Models.Target.ItemAttribute>
+                ItemAttributes = new ItemAttributes
                 {
-                    new Models.Target.ItemAttribute()
-                    {
-                        DisplayOrder = 1,
-                        Description = "UT ATTR TO REMOVE",
-                        Name = "UT ATTR",
-                        Value = "VALUE CHANGED"
-                    }
+                    Calories = 45
                 }
             };
 
@@ -339,15 +324,11 @@ namespace Roost.ItemSync.ETL.UnitTests.Utilities
                 },
                 UnitQuantity = 1,
                 Upc = "6345789",
-                Attributes = new List<Models.Target.ItemAttribute>
+                ItemAttributes = new ItemAttributes
                 {
-                    new Models.Target.ItemAttribute()
-                    {
-                        DisplayOrder = 1,
-                        Description = "UT ATTR TO REMOVE",
-                        Name = "UT ATTR",
-                        Value = "VALUE CHANGED"
-                    }
+                    Calories = 52,
+                    Price = 3.99m,
+                    CupSize = "Small"
                 }
             };
 
@@ -403,7 +384,8 @@ namespace Roost.ItemSync.ETL.UnitTests.Utilities
                     Name = "Pack"
                 },
                 UnitQuantity = 1,
-                Upc = "6345789"
+                Upc = "6345789",
+                ImageUrl = string.Empty
             };
 
             Assert.IsFalse(ItemComparer.DoItemsMatch(source, target));
@@ -437,8 +419,7 @@ namespace Roost.ItemSync.ETL.UnitTests.Utilities
                 {
                     new Models.Source.ItemImage()
                     {
-                        AbsoluteUri = "SOME URI",
-                        DisplayOrder = 0
+                        AbsoluteUri = "SOME NEW URI"
                     }
                 }
 
@@ -459,14 +440,7 @@ namespace Roost.ItemSync.ETL.UnitTests.Utilities
                 },
                 UnitQuantity = 1,
                 Upc = "6345789",
-                Images = new List<Models.Target.ItemImage>
-                {
-                    new Models.Target.ItemImage()
-                    {
-                         AbsoluteUri = "SOME URI",
-                         DisplayOrder = 2
-                    }
-                }
+                ImageUrl = "SOME URI"                
             };
 
             Assert.IsFalse(ItemComparer.DoItemsMatch(source, target));
@@ -522,14 +496,7 @@ namespace Roost.ItemSync.ETL.UnitTests.Utilities
                 },
                 UnitQuantity = 1,
                 Upc = "6345789",
-                Images = new List<Models.Target.ItemImage>
-                {
-                    new Models.Target.ItemImage()
-                    {
-                         AbsoluteUri = "SOME OTHER URI",
-                         DisplayOrder = 0
-                    }
-                }
+                ImageUrl = "SOME OTHER URI"
             };
 
             Assert.IsFalse(ItemComparer.DoItemsMatch(source, target));
@@ -576,14 +543,7 @@ namespace Roost.ItemSync.ETL.UnitTests.Utilities
                 },
                 UnitQuantity = 1,
                 Upc = "6345789",
-                Images = new List<Models.Target.ItemImage>
-                {
-                    new Models.Target.ItemImage()
-                    {
-                         AbsoluteUri = "SOME OTHER URI",
-                         DisplayOrder = 0
-                    }
-                }
+                ImageUrl = "SOME URI"
             };
 
             Assert.IsFalse(ItemComparer.DoItemsMatch(source, target));

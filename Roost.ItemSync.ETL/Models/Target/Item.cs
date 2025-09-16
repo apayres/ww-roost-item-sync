@@ -18,7 +18,7 @@ namespace Roost.ItemSync.ETL.Models.Target
 
         public double UnitQuantity { set; get; }
 
-        public List<ItemAttribute> Attributes { get; set; }
+        public ItemAttributes ItemAttributes { get; set; }
 
         public string Category { get; set; }
 
@@ -30,6 +30,6 @@ namespace Roost.ItemSync.ETL.Models.Target
 
         public UnitOfMeasure UnitOfMeasure { get; set; }
 
-        public List<ItemImage> Images { get; set; }
+        public string ImageUrl { get; set; }
     }
 }
