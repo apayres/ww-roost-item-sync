@@ -8,6 +8,7 @@ namespace Roost.ItemSync.ETL.Utilities
         {
             var item = new Item()
             {
+                OriginalItemId = source.ItemId,
                 Upc = source.Upc,
                 ItemName = source.ItemName,
                 ItemDescription = source.ItemDescription,
@@ -34,12 +35,6 @@ namespace Roost.ItemSync.ETL.Utilities
                     if (attribute.AttributeName == AttributeKeys.Calories && int.TryParse(attribute.AttributeValue.AttributeValue.ToString(), out int calories))
                     {
                         item.ItemAttributes.Calories = calories;
-                        continue;
-                    }
-
-                    if (attribute.AttributeName == AttributeKeys.Price && decimal.TryParse(attribute.AttributeValue.AttributeValue.ToString(), out decimal price))
-                    {
-                        item.ItemAttributes.Price = price;
                         continue;
                     }
 

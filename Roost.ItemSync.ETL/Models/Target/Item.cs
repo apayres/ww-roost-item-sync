@@ -8,6 +8,8 @@ namespace Roost.ItemSync.ETL.Models.Target
         [JsonProperty(PropertyName = "id")]
         public Guid Id { get; set; }
 
+        public int OriginalItemId { get; set; }
+
         public string PartitionKey {  get; set; }
 
         public string Upc { set; get; }

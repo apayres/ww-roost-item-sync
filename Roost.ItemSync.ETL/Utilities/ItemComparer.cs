@@ -6,6 +6,11 @@ namespace Roost.ItemSync.ETL.Utilities
     {
         public static bool DoItemsMatch(Models.Source.Item source, Models.Target.Item target)
         {
+            if (source.ItemId != target.OriginalItemId)
+            {
+                return false;                
+            }
+
             if (source.ItemName != target.ItemName)
             {
                 return false;

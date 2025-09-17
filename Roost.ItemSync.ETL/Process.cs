@@ -9,12 +9,16 @@ namespace Roost.ItemSync.ETL
     {
         private readonly IItemsRepository _itemRepository;
         private readonly IItemWebService _itemWebService;
+        private readonly IIngredientWebService _ingredientWebService;
+        private readonly IRecipeRepository _recipeRepository;
         private readonly ILogger<Process> _logger;
 
-        public Process(IItemsRepository itemRepository, IItemWebService itemWebService, ILogger<Process> logger)
+        public Process(IItemsRepository itemRepository, IItemWebService itemWebService, IIngredientWebService ingredientWebService, IRecipeRepository recipeRepository, ILogger<Process> logger)
         {
             _itemRepository = itemRepository;
             _itemWebService = itemWebService;
+            _ingredientWebService = ingredientWebService;
+            _recipeRepository = recipeRepository;
             _logger = logger;
         }
 
@@ -26,8 +30,12 @@ namespace Roost.ItemSync.ETL
             _logger.LogInformation("Getting Existing Items");
             var existingItems = await _itemRepository.GetAll();
 
-            _logger.LogInformation("Performing Sync");
+            _logger.LogInformation("Performing Item Sync");
             await SyncItems(items, existingItems);
+
+            _logger.LogInformation("Performing Recipe Sync");
+            existingItems = await _itemRepository.GetAll();
+            await SyncRecipes(existingItems);
         }
 
         private async Task SyncItems(List<Models.Source.Item> items, List<Models.Target.Item> existingItems)
@@ -120,6 +128,45 @@ namespace Roost.ItemSync.ETL
             }
 
             return itemsUpdated;
+        }
+
+        private async Task SyncRecipes(List<Models.Target.Item> items)
+        {
+            foreach(var item in items)
+            {
+                await SyncRecipe(item);
+            }
+        }
+
+        private async Task SyncRecipe(Models.Target.Item item)
+        {
+            var ingredients = await _ingredientWebService.GetRecipe(item.OriginalItemId);
+            var recipe = await _recipeRepository.GetRecipe(item.Id);
+
+            if (recipe == null && ingredients == null || !ingredients.Any())
+            {
+                return;
+            }
+
+            if(recipe == null && ingredients != null && ingredients.Any())
+            {
+                await _recipeRepository.Insert(new Models.Target.Recipe()
+                {
+                    Ingredients = ingredients.Select(x => IngredientMapper.MapToTarget(x)).ToList(),
+                    ItemId = item.Id
+                });
+
+                return;
+            }
+
+            if(recipe != null && ingredients == null || !ingredients.Any())
+            {
+                await _recipeRepository.Delete(recipe);
+                return;
+            }
+
+            recipe.Ingredients = ingredients.Select(x => IngredientMapper.MapToTarget(x)).ToList();
+            await _recipeRepository.Update(recipe);
         }
     }
 }

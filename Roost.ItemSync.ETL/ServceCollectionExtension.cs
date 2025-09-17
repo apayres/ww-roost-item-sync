@@ -15,6 +15,8 @@ namespace Roost.ItemSync.ETL
             services.AddSingleton<IImagesWebService, ImagesWebService>();
             services.AddSingleton<IAttributesWebService, AttributesWebService>();
             services.AddSingleton<IItemWebService,  ItemWebService>();
+            services.AddSingleton<IIngredientWebService, IngredientWebService>();
+            services.AddSingleton<IRecipeRepository, RecipeRepository>();
             services.AddSingleton<IProcess, Process>();
             return services;
         }
